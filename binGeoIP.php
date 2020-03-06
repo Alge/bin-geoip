@@ -1,9 +1,11 @@
 <?php
 
-$binFileNameV4 = "geoIP-v4.bin";
-$binFileNameV6 = "geoIP-v6.bin";
-$csvFileNameV4 = "geoIP-v4.csv";
-$csvFileNameV6 = "geoIP-v6.csv";
+$filePath = sys_get_temp_dir().'/rupert';
+$binFileNameV4 = $filePath."/geoIP-v4.bin";
+$binFileNameV6 = $filePath."/geoIP-v6.bin";
+$csvFileNameV4 = $filePath."/geoIP-v4.csv";
+$csvFileNameV6 = $filePath."/geoIP-v6.csv";
+
 
 // Be carefull when using the actual url to download the database.
 // Your IP will be banned if you download more than 3 databases per 24-hour period
@@ -17,6 +19,8 @@ $v6URL = "https://example.com/path/IpToCountry.6R.csv.gz";
 //$v6URL = "https://software77.net/geo-ip/?DL=7";
 
 function downloadCSV($source, $outFileName){
+  global $filePath;
+  mkdir($filePath, 0700);
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $source);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -308,7 +312,7 @@ function getGeoIP6($ip){
   }
   return false;
 }
-function getGeoIP($ip){
+function getgeoip($ip){
   if (strpos($ip, ":", 1)){
     return getGeoIP6($ip);
   }
