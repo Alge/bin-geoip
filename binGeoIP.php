@@ -41,15 +41,14 @@ function generateBinfileV4(){
   global $csvFileNameV4;
   global $v4URL;
 
-  $csv = fopen($csvFileNameV4, "r");
-
-  // CSV file doesn't exist yet, lets download it!
-  if(!$csv){
+  if(!file_exists($csvFileNameV4)){
     if (!downloadCSV($v4URL, $csvFileNameV4)){
+      // Download failed
       return false;
     }
-    $csv = fopen($csvFileNameV4, "r");
   }
+  $csv = fopen($csvFileNameV4, "r");
+
 
   $binfile = fopen($binFileNameV4, "wb");
 
@@ -110,15 +109,15 @@ function generateBinfileV6(){
   global $csvFileNameV6;
   global $v6URL;
 
-  $csv = fopen($csvFileNameV6, "r");
-
-  // CSV file doesn't exist yet, lets download it!
-  if(!$csv){
+  if(!file_exists($csvFileNameV6)){
+    // CSV file doesn't exist yet, lets download it!
     if (!downloadCSV($v6URL, $csvFileNameV6)){
+      // Download failed
       return false;
     }
-    $csv = fopen($csvFileNameV6, "r");
   }
+
+  $csv = fopen($csvFileNameV6, "r");
 
   $binfile = fopen($binFileNameV6, "wb");
 
@@ -207,6 +206,9 @@ function getGeoIP4($ip){
   // 2 bytes country name
   $structSize = 4 + 4 + 2;
 
+  if (!file_exists($binFileNameV4)){
+    generateBinfileV4();
+  }
   $binfile = fopen($binFileNameV4, "rb");
   $fileLength = filesize($binFileNameV4);
 
@@ -252,7 +254,11 @@ function getGeoIP6($ip){
   // 2 bytes country name
   $structSize = 16 + 16 + 2;
 
+  if (!file_exists($binFileNameV6)){
+    generateBinfileV6();
+  }
   $binfile = fopen($binFileNameV6, "rb");
+
   $fileLength = filesize($binFileNameV6);
 
   $low = 0;
@@ -301,5 +307,13 @@ function getGeoIP6($ip){
     }
   }
   return false;
+}
+function getGeoIP($ip){
+  if (strpos($ip, ":", 1)){
+    return getGeoIP6($ip);
+  }
+  else{
+    return getGeoIP4($ip);
+  }
 }
 ?>
